@@ -37,7 +37,7 @@ setup(
         ],
     },
 
-    install_requires=['numpy'],
+    install_requires=['numpy', 'vesna-spectrumsensor'],
 
     cmdclass={'install': install}
 )

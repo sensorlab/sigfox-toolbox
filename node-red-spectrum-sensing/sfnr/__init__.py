@@ -23,6 +23,11 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 class SFNRBaseNode(object):
 	TEMPLATE = "httprequest"
 
+	def run(self, opts):
+		print("Running node '%s' on port %d" % (self.SLUG, self.PORT))
+		print("Options: %s" % (opts,))
+		self.run_server()
+
 	def run_server(self):
 		server_address = ('localhost', self.PORT)
 		httpd = HTTPServer(server_address, HTTPRequestHandler)
@@ -60,15 +65,23 @@ class SFNRBaseNode(object):
 
 def main():
 	parser = argparse.ArgumentParser(description="Node-RED block starter")
+	parser.add_argument("-o", "--option", metavar="KEY=VAL", action='append', nargs="?")
 	parser.add_argument("node", metavar="NODE", nargs=1)
 
 	args = parser.parse_args()
 
+	opts = {}
+	if args.option:
+		for opt in args.option:
+			key, val = opt.split('=')
+			opts[key] = val
+
 	m = import_module("sfnr.nodes." + args.node[0])
 	node = m.SFNRNode()
 
-	print("Running node '%s' on port %d" % (args.node[0], node.PORT))
-	node.run_server()
+	assert args.node[0] == node.SLUG
+
+	node.run(opts)
 
 if __name__ == "__main__":
 	main()
