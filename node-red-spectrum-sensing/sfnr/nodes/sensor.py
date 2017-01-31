@@ -1,5 +1,5 @@
-from sfnr import SFNRBaseNode
-from sfnr.config import Ns, fc, fs
+from sfnr.core import SFNRBaseNode
+from sfnr.config.sensing import Ns, fc, fs
 
 import json
 import socket

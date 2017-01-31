@@ -20,20 +20,24 @@ class install(_install):
 			m.SFNRNode.install()
 
 setup(
-    name='sfnr-sensing',
+    name='sfnr',
 
     version='1.0.0',
 
-    description='Node-RED sensing components',
+    description='Support for Node-RED Python blocks',
 
     author='Tomaz Solc',
     author_email='tomaz.solc@ijs.si',
 
     packages=find_packages(),
 
-    namespace_packages=['sfnr', 'sfnr.nodes', 'sfnr.config'],
+    namespace_packages=['sfnr', 'sfnr.nodes'],
 
-    install_requires=['sfnr', 'numpy', 'vesna-spectrumsensor'],
+    entry_points={
+        'console_scripts': [
+            'sfnr=sfnr.core:main',
+        ],
+    },
 
     cmdclass={'install': install}
 )

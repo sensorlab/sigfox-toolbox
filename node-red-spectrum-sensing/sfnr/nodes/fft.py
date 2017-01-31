@@ -1,4 +1,4 @@
-from sfnr import SFNRBaseNode
+from sfnr.core import SFNRBaseNode
 import numpy as np
 
 class SFNRNode(SFNRBaseNode):

@@ -1,4 +1,4 @@
-from sfnr import SFNRBaseNode
+from sfnr.core import SFNRBaseNode
 
 class SFNRNode(SFNRBaseNode):
 	PORT = 7210
