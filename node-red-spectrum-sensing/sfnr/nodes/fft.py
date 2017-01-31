@@ -36,6 +36,8 @@ class SFNRNode(SFNRBaseNode):
 sfnr fft
 </pre>"""
 
+	CATEGORY = "sensing"
+
 	def work(self, msg):
 		x = np.array(msg['data'])
 

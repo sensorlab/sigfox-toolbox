@@ -35,6 +35,8 @@ class SFNRNode(SFNRBaseNode):
 sfnr -osensor_url=socket://<i>ip</i>:2101 sensor
 </pre>"""
 
+	CATEGORY = "sensing"
+
 	def run(self, opts):
 		print("Running node '%s' connecting to port %d" % (self.SLUG, self.PORT))
 

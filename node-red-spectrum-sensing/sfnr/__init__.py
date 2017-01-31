@@ -57,6 +57,7 @@ class SFNRBaseNode(object):
 		t = t % { 'port': cls.PORT,
 			  'name': cls.NAME,
 			  'slug': cls.SLUG,
+			  'category': cls.CATEGORY,
 			  'desc': cls.DESC }
 
 		print("writing %s" % (out_path,))

@@ -9,6 +9,8 @@ class SFNRNode(SFNRBaseNode):
 
 	DESC = 'Example node'
 
+	CATEGORY = 'examples'
+
 	def work(self, msg):
 		msg['greeting'] = 'Hello, world!'
 		return msg

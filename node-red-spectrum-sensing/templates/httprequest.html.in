@@ -25,7 +25,7 @@
 
 <script type="text/javascript">
     RED.nodes.registerType('%(slug)s',{
-        category: 'sigfox',
+        category: '%(category)s',
         color:"rgb(231, 231, 174)",
         inputs:1,
         outputs:1,
