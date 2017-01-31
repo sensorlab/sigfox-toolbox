@@ -1,8 +1,7 @@
-#!/usr/bin/python2.7
 from sfnr import SFNRBaseNode
 
 class SFNRNode(SFNRBaseNode):
-	PORT = 7212
+	PORT = 7210
 
 	NAME = 'Example'
 

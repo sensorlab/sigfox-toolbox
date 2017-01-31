@@ -37,5 +37,7 @@ setup(
         ],
     },
 
+    install_requires=['numpy'],
+
     cmdclass={'install': install}
 )
