@@ -24,7 +24,7 @@ setup(
 
     version='1.0.0',
 
-    description='Node-RED sensing components',
+    description='Node-RED blocks for spectrum sensing',
 
     author='Tomaz Solc',
     author_email='tomaz.solc@ijs.si',
