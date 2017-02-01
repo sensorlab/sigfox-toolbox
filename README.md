@@ -13,9 +13,11 @@ in the [LOG-a-TEC testbed](http://log-a-tec.eu/) and the
 Note that some components are not present in the public repository due to a
 non-disclosure agreement.
 
+![](figures/overview.png)
+
 ## Installation instructions
 
-These instructions assume a reasonable up-to-date Linux system with a Python
+These instructions assume a reasonably up-to-date Linux system with a Python
 3.x interpreter already installed.
 
 ### Node-RED
