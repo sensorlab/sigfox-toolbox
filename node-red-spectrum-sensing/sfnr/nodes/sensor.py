@@ -4,8 +4,16 @@ from sfnr.config.sensing import Ns, fc, fs
 import json
 import socket
 import time
+import signal
 
 from vesna.spectrumsensor import SpectrumSensor, SweepConfig
+
+want_stop = False
+
+def handler(signum, frame):
+	global want_stop
+	print("Stopping sensor. Please wait.")
+	want_stop = True
 
 class SFNRNode(SFNRBaseNode):
 
@@ -60,6 +68,7 @@ sfnr -osensor_url=socket://<i>ip</i>:2101 sensor
 		s.connect(("localhost", self.PORT))
 
 		def callback(sample_config, data):
+			global want_stop
 
 			j = json.dumps({
 				'local_timestamp': time.time(),
@@ -70,6 +79,9 @@ sfnr -osensor_url=socket://<i>ip</i>:2101 sensor
 			j += '\n'
 			s.sendall(j.encode('ascii'))
 
-			return True
+			return not want_stop
+
+		signal.signal(signal.SIGTERM, handler)
+		signal.signal(signal.SIGINT, handler)
 
 		sensor.sample_run(sample_config, callback)
