@@ -10,13 +10,13 @@ class SFNRNode(SFNRBaseNode):
 	SLUG = 'fft'
 
 	DESC = """
-<p>Perform a discrete Fourier transform on signal samples and return spectral power density.</p>
+<p>Perform a discrete Fourier transform on signal samples and return the power spectrum.</p>
 
 <p>Input:</p>
 
 <pre>
 {
-    'timestamp': <i>timestamp</i>
+    ...
     'data': [ <i>samples</i> ]
 }
 </pre>
@@ -25,7 +25,7 @@ class SFNRNode(SFNRBaseNode):
 
 <pre>
 {
-    'timestamp': <i>timestamp</i>
+    ...
     'fft': [ <i>fft bins</i> ]
 }
 </pre>
@@ -52,7 +52,6 @@ sfnr fft
 		pn = p / (nsamples**2.) / (2 ** 22)
 		pn = np.clip(pn, 1e-15, 1)
 
-		return {
-			'timestamp': msg['timestamp'],
-			'fft': pn.tolist()
-		}
+		msg['fft'] = pn.tolist()
+
+		return msg
