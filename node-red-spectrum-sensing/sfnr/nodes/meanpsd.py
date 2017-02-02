@@ -27,7 +27,7 @@ class SFNRNode(SFNRBaseNode):
 <pre>
 {
     ...
-    'psd': [ <i>fft bins</i> ]
+    'meanpsd': [ <i>fft bins</i> ]
 }
 </pre>
 
@@ -66,6 +66,6 @@ sfnr meanpsd
 		w = np.array(msg['fft'])
 		self._ingest(w)
 
-		msg['psd'] = self._get_psd().tolist()
+		msg['meanpsd'] = self._get_psd().tolist()
 
 		return msg
