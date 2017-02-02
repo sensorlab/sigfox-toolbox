@@ -20,6 +20,16 @@ non-disclosure agreement.
 These instructions assume a reasonably up-to-date Linux system with a Python
 3.x interpreter already installed.
 
+While exact versions of software packages shouldn't matter, this toolbox was
+last checked to be working with the following:
+
+ *  Debian GNU/Linux release 8.7 (Jessie),
+ *  Node-RED 0.15.1, running under Node.js 4.7.3,
+ *  Python 3.5.2,
+ *  bokeh 0.12.4,
+ *  numpy 1.12.0,
+ *  vesna-spectrumsensor 1.0.6
+
 ### Node-RED
 
 See [installation
