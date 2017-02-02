@@ -15,6 +15,17 @@ non-disclosure agreement.
 
 ![](figures/overview.png)
 
+## Getting started
+
+The recommended way of getting started with the toolbox:
+
+ 1. Follow the general installation instructions in this `README.md`
+
+ 2. Install all individual components from the subdirectories, following their
+    specific installation instructions.
+
+ 3. Try running the packet loss Node-RED flow.
+
 ## Installation instructions
 
 These instructions assume a reasonably up-to-date Linux system with a Python
@@ -29,6 +40,27 @@ last checked to be working with the following:
  *  bokeh 0.12.4,
  *  numpy 1.12.0,
  *  vesna-spectrumsensor 1.0.6
+
+To perform example experiments from the toolbox you will also need:
+
+ *  Network access to a SNE-ESHTER spectrum sensor (part of the LOG-a-TEC
+    testbed)
+
+ *  SIGFOX back-end login credentials that allow callback configuration *or*
+    access to a host in LOG-a-TEC testbed that is already set up to receive
+    back-end callbacks.
+
+ *  Network access to a SIGFOX test device.
+
+Setting up a new SIGFOX test device also requires:
+
+ *  SIGFOX back-end login credentials that allow device management.
+
+ *  SFXLIB binary library.
+
+ *  SIGFOX device id, AES key and PAC code.
+
+ *  VESNA SNC board, Olimex ARM-USB-OCD programmer, USRP device.
 
 ### Node-RED
 
