@@ -219,7 +219,27 @@ class SFNRNode(SFNRBaseNode):
 
 	SLUG = 'psdvisual'
 
-	DESC = 'Example node'
+	DESC = """
+<p>Real-time visualization of spectrum sensing data and channel selection based on mean power spectral density (PDF)</p>
+
+<p>Input:</p>
+
+<pre>
+{
+    'data': [ <i>samples</i> ]
+    'fft': [ <i>fft bins</i> ]
+    'meanpsd': [ <i>fft bins</i> ]
+    'f_tx': [ <i>frequency in hertz</i> ]
+}
+</pre>
+
+<p>To run back-end for this node, run the following in the <code>node-red-visualization</code> directory:</p>
+
+<pre>
+bokeh serve nodes/psdvisual.py
+</pre>
+
+<p>After the back-end is running, the visualization can be seen at <a href="http://localhost:5006/psdvisual" target="_blank">http://localhost:5006/psdvisual</a></p>"""
 
 	CATEGORY = 'sensing'
 
