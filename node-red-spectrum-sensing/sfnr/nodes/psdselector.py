@@ -1,5 +1,5 @@
 from sfnr.core import SFNRBaseNode
-from sfnr.config.sensing import Ns, fc, fc_corr, fs, f_min, f_max
+from sfnr.config.sensing import Ns, fc, fc_corr, fs, f_min, f_max, Nselector
 import numpy as np
 
 class SFNRNode(SFNRBaseNode):
@@ -18,7 +18,7 @@ class SFNRNode(SFNRBaseNode):
 <pre>
 {
     ...
-    'psd': [ <i>fft bins</i> ]
+    'meanpsd': [ <i>fft bins</i> ]
 }
 </pre>
 
@@ -40,9 +40,7 @@ sfnr psdselector
 	CATEGORY = "sensing"
 
 	def work(self, msg):
-		psd = np.array(msg['psd'])
-
-		N = 50
+		psd = np.array(msg['meanpsd'])
 
 		# spectrum sensor's fc (corrected)
 		fc_real = fc - fc_corr
@@ -50,7 +48,7 @@ sfnr psdselector
 		# list of candidate frequencies
 		f_tx = []
 
-		# choose N most vacant frequencies
+		# choose Nselector most vacant frequencies
 		for i in np.argsort(psd):
 
 			# ignore DC component
@@ -68,7 +66,7 @@ sfnr psdselector
 			# we have microchannels at 100 Hz raster
 			f_tx.append(f + 100.)
 
-			if len(f_tx) >= N:
+			if len(f_tx) >= Nselector:
 				break
 
 		msg['f_tx'] = f_tx
