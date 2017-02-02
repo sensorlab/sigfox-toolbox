@@ -1,0 +1,5 @@
+bokeh~=0.12
+numpy
+sfnr
+sfnr-sensing
+pillow
