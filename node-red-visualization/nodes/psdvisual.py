@@ -217,7 +217,7 @@ class SFNRNode(SFNRBaseNode):
 
 	NAME = 'PSD visualization'
 
-	SLUG = 'visual'
+	SLUG = 'psdvisual'
 
 	DESC = 'Example node'
 
@@ -264,4 +264,6 @@ def main():
 	thread = Thread(target=node.run, args=(opts,))
 	thread.start()
 
-main()
+if __name__.startswith("bk_script"):
+	# only start if run under "bokeh serve"
+	main()
