@@ -100,6 +100,15 @@ Outputs from the transmit and receive flow can also be connected to `tx_log`
 and `rx_log` respectively to write packet data to files for later
 postprocessing.
 
+## See also
+
+ *  [eWINE project deliverable D3.1](https://ewine-project.eu/deliverables/),
+    section 2.4.4.
+ *  [eWINE project deliverable D4.1](https://ewine-project.eu/deliverables/),
+    section 3.2.
+ *  T. Šolc, T. Gale, C. Fortuna: *Optimization of Ultra-Narrowband Wireless
+Communication: an Experimental Case Study* (to be published).
+
 ## Author and license
 
 Node-RED flow for measuring packet loss in a SIGFOX network was written by
