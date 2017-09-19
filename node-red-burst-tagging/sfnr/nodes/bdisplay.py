@@ -1,6 +1,7 @@
 from sfnr.core import SFNRBaseNode
 import numpy as np
 import pygame
+from matplotlib.cm import get_cmap
 
 
 class SFNRNode(SFNRBaseNode):
@@ -49,6 +50,8 @@ sfnr fft
 		self.back = pygame.Surface(self.size)
 		self.line = pygame.Surface((self.size[0], 1))
 
+		self.cmap = get_cmap('magma')
+
 		super().run(opts)
 
 	def work(self, msg):
@@ -59,13 +62,16 @@ sfnr fft
 
 		v = ((x - vmin) / (vmax-vmin))[::2]
 		v = v.clip(0, 1)
-		v = np.array(255*v, dtype=int)
+		#v = np.array(255*v, dtype=int)
 
 		a = pygame.surfarray.pixels3d(self.line)
 
-		a[:,0,0] = v
-		a[:,0,1] = v
-		a[:,0,2] = v
+		b = np.empty((v.shape[0], 3))
+		for i in range(v.shape[0]):
+			b[i,:] = self.cmap(v[i])[:3]
+
+		b *= 255
+		a[:,0,:] = b
 
 		del a
 
