@@ -93,16 +93,25 @@ sfnr fft
 
 			(x, y, w, h) = cv2.boundingRect(c)
 
+			tstart = self.t[y]
+			tstop = self.t[y+h-1]
+			fc = (x+w/2.)/2.
+			bw = w/2.
+
+			ppeak = np.max(self.x[y:y+h-1,x:x+w-1])
+
+			text = "fc=%.0f Hz BW=%.0f Hz\nt=%.1f s Ppeak=%.0f dBm" % (
+					fc, bw, tstop-tstart, ppeak)
+
 			bursts.append({
-				'tstart': self.t[y],
-				'tstop': self.t[y+h-1],
-				'fc': (x+w/2.)/2.,
-				'bw': w/2.,
-				'text': 'test',
+				'tstart': tstart,
+				'tstop': tstop,
+				'fc': fc,
+				'bw': bw,
+				'text': text,
 				})
 
 		print("detected %d bursts" % (len(bursts),))
-		print(bursts)
 
 		return bursts
 
