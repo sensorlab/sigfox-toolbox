@@ -1,0 +1,127 @@
+/**
+ * Based on Node-RED code, modified by Tomaz Solc.
+ *
+ * Copyright 2013,2015 IBM Corp.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ **/
+
+module.exports = function(RED) {
+    "use strict";
+    var reconnectTime = RED.settings.socketReconnectTime||10000;
+    var socketTimeout = RED.settings.socketTimeout||null;
+    var net = require('net');
+
+    var connectionPool = {};
+
+    function TcpIn(n) {
+        RED.nodes.createNode(this,n);
+        this.host = null;
+        this.port = %(port)s;
+        this.topic = null;
+        this.stream = true;
+        this.datatype = 'utf8';
+        this.newline = "\n";
+        this.base64 = n.base64;
+        this.closing = false;
+        this.connected = false;
+        var node = this;
+        var count = 0;
+
+        var server = net.createServer(function (socket) {
+            socket.setKeepAlive(true,120000);
+            if (socketTimeout !== null) { socket.setTimeout(socketTimeout); }
+            var id = (1+Math.random()*4294967295).toString(16);
+            connectionPool[id] = socket;
+            count++;
+            node.status({text:RED._("tcpin.status.connections",{count:count})});
+
+            var buffer = (node.datatype == 'buffer')? new Buffer(0):"";
+            socket.on('data', function (data) {
+                if (node.datatype != 'buffer') {
+                    data = data.toString(node.datatype);
+                }
+                if (node.stream) {
+                    var msg;
+                    if ((typeof data) === "string" && node.newline !== "") {
+                        buffer = buffer+data;
+                        var parts = buffer.split(node.newline);
+                        for (var i = 0; i<parts.length-1; i+=1) {
+                            msg = {topic:node.topic, payload:parts[i],ip:socket.remoteAddress,port:socket.remotePort};
+                            msg._session = {type:"tcp",id:id};
+                            node.send(msg);
+                        }
+                        buffer = parts[parts.length-1];
+                    } else {
+                        msg = {topic:node.topic, payload:data};
+                        msg._session = {type:"tcp",id:id};
+                        node.send(msg);
+                    }
+                } else {
+                    if ((typeof data) === "string") {
+                        buffer = buffer+data;
+                    } else {
+                        buffer = Buffer.concat([buffer,data],buffer.length+data.length);
+                    }
+                }
+            });
+            socket.on('end', function() {
+                if (!node.stream || (node.datatype === "utf8" && node.newline !== "")) {
+                    if (buffer.length > 0) {
+                        var msg = {topic:node.topic, payload:buffer};
+                        msg._session = {type:"tcp",id:id};
+                        node.send(msg);
+                    }
+                    buffer = null;
+                }
+            });
+            socket.on('timeout', function() {
+                node.log(RED._("tcpin.errors.timeout",{port:node.port}));
+                socket.end();
+            });
+            socket.on('close', function() {
+                delete connectionPool[id];
+                count--;
+                node.status({text:RED._("tcpin.status.connections",{count:count})});
+            });
+            socket.on('error',function(err) {
+                node.log(err);
+            });
+        });
+        server.on('error', function(err) {
+            if (err) {
+                node.error(RED._("tcpin.errors.cannot-listen",{port:node.port,error:err.toString()}));
+            }
+        });
+
+        server.listen(node.port, function(err) {
+            if (err) {
+                node.error(RED._("tcpin.errors.cannot-listen",{port:node.port,error:err.toString()}));
+            } else {
+                node.log(RED._("tcpin.status.listening-port",{port:node.port}));
+                node.on('close', function() {
+                    for (var c in connectionPool) {
+                        if (connectionPool.hasOwnProperty(c)) {
+                            connectionPool[c].end();
+                            connectionPool[c].unref();
+                        }
+                    }
+                    node.closing = true;
+                    server.close();
+                    node.log(RED._("tcpin.status.stopped-listening",{port:node.port}));
+                });
+            }
+        });
+    }
+    RED.nodes.registerType("%(slug)s",TcpIn);
+}
