@@ -33,7 +33,7 @@ setup(
 
     namespace_packages=['sfnr', 'sfnr.nodes'],
 
-    install_requires=['sfnr', 'numpy', 'pygame', 'matplotlib'],
+    install_requires=['sfnr', 'numpy', 'pygame', 'matplotlib', 'opencv-python' ],
 
     cmdclass={'install': install}
 )

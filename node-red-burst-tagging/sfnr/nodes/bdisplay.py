@@ -64,18 +64,19 @@ sfnr fft
 		if 'data' in msg:
 			self.spectrum_update(msg)
 
-			if np.random.random() < .1:
-				self.add_burst({'burst':{
-					'tstart': self.t[700],
-					'tstop': self.t[703],
-					'fc': np.random.random()*512,
-					'bw': 3,
-					'text': 'aaa\nbbbb\ncc'}})
-		elif 'burst' in msg:
-			self.add_burst(msg)
+			#if np.random.random() < .1:
+			#	self.add_burst({'burst':{
+			#		'tstart': self.t[700],
+			#		'tstop': self.t[703],
+			#		'fc': np.random.random()*512,
+			#		'bw': 3,
+			#		'text': 'aaa\nbbbb\ncc'}})
+		elif 'bursts' in msg:
+			for burst in msg['bursts']:
+				self.add_burst(burst)
 
-	def add_burst(self, msg):
-		burst = msg['burst']
+	def add_burst(self, burst):
+		print(burst)
 		RED = (255, 0, 0)
 
 		def gety(t):
