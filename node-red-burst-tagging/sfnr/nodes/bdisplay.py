@@ -43,6 +43,9 @@ sfnr fft
 
 	def run(self, opts):
 		pygame.display.init()
+		pygame.font.init()
+
+		self.font = pygame.font.SysFont("sans", 10)
 
 		self.size = 512, 800
 		self.screen = pygame.display.set_mode(self.size)
@@ -52,10 +55,59 @@ sfnr fft
 
 		self.cmap = get_cmap('magma')
 
+		self.t = np.empty(self.size[1])
+		self.t[:] = 0
+
 		super().run(opts)
 
 	def work(self, msg):
+		if 'data' in msg:
+			self.spectrum_update(msg)
+
+			if np.random.random() < .1:
+				self.add_burst({'burst':{
+					'tstart': self.t[700],
+					'tstop': self.t[703],
+					'fc': np.random.random()*512,
+					'bw': 3,
+					'text': 'aaa\nbbbb\ncc'}})
+		elif 'burst' in msg:
+			self.add_burst(msg)
+
+	def add_burst(self, msg):
+		burst = msg['burst']
+		RED = (255, 0, 0)
+
+		def gety(t):
+			return int(np.round(np.interp(t, self.t, np.arange(len(self.t)))))
+
+		y1 = gety(burst['tstart'])
+		y2 = gety(burst['tstop'])
+
+		x1 = int(burst['fc'] - burst['bw']/2)
+		x2 = int(burst['fc'] + burst['bw']/2)
+
+		r = pygame.Rect(x1, y1, x2-x1, y2-y1)
+		pygame.draw.rect(self.back, RED, r, 1)
+
+		mw = -1
+		texts = []
+		for t in burst['text'].split('\n'):
+			text = self.font.render(t, True, RED)
+			mw = max(text.get_size()[0], mw)
+			texts.append(text)
+
+		x = min(x2, self.size[0]-mw)
+		y = y2
+		for text in texts:
+			self.back.blit(text, (x, y))
+			y += 10
+
+	def spectrum_update(self, msg):
 		x = np.array(msg['data'])
+
+		self.t[:-1] = self.t[1:]
+		self.t[-1] = msg['timestamp']
 
 		vmin = -130
 		vmax = -100
