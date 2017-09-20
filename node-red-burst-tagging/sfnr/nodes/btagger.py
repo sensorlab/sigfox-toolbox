@@ -109,7 +109,7 @@ sfnr fft
 
 			ppeak = np.max(self.x[y:y+h-1,x:x+w-1])
 
-			text = "%.6f MHz %.1f s\n%.0f dBm %.3f kHz" % (
+			text = "%.6f MHz  %.1f s\n%4.0f dBm  %6.3f kHz" % (
 					fc/1e6, tstop-tstart, ppeak, bw/1e3)
 
 			bursts.append({
@@ -118,6 +118,7 @@ sfnr fft
 				'fc': fc,
 				'bw': bw,
 				'text': text,
+				'bold': int(ppeak > -100),
 				})
 
 		print("detected %d bursts" % (len(bursts),))

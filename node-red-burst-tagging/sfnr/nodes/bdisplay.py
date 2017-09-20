@@ -21,7 +21,7 @@ class InfoQueue(object):
 
 	def add(self, ibe):
 		self.q.append(ibe)
-		self.q.sort(key=lambda ibe:ibe.y)
+		self.q.sort(key=lambda ibe:(ibe.ib.prio, ibe.y))
 
 	def scroll(self):
 		q2 = []
@@ -46,10 +46,11 @@ class InfoQueue(object):
 		self.q = q2
 
 class InfoBlock2(object):
-	def __init__(self, surface, anchor, color):
+	def __init__(self, surface, anchor, color, prio):
 		self.surface = surface
 		self.anchor = anchor
 		self.color = color
+		self.prio = prio
 
 	def blit(self, back, x, y):
 		back.blit(self.surface, (x,y))
@@ -90,6 +91,7 @@ class InfoBlock(object):
 
 
 		self.surface = pygame.Surface((w, h))
+		self.surface.set_alpha(color[3])
 
 		y = 0
 		for surface in surfaces:
@@ -185,8 +187,12 @@ sfnr fft
 				self.add_burst(burst)
 
 	def add_burst(self, burst):
-		#print(burst)
-		RED = (255, 0, 0, 128)
+		if burst['bold']:
+			color = (255, 0, 0, 200)
+			prio = 0
+		else:
+			color = (255, 0, 0, 120)
+			prio = 1
 
 		def gety(t):
 			return int(np.round(np.interp(t, self.t, np.arange(len(self.t)))))
@@ -198,15 +204,15 @@ sfnr fft
 		x2 = cfg.freq_to_bin(burst['fc'] + burst['bw']/2)//self.K + self.margin
 
 		r = pygame.Rect(x1, y1, x2-x1, y2-y1)
-		pygame.draw.rect(self.info, RED, r, 1)
+		pygame.draw.rect(self.info, color, r, 1)
 
-		infoblock = InfoBlock(burst['text'], self.font, RED)
+		infoblock = InfoBlock(burst['text'], self.font, color)
 
 		if (x1+x2)/2 > self.margin + self.size[0]/2:
-			ib2 = InfoBlock2(infoblock.surface, (x2, (y1+y2)/2), RED)
+			ib2 = InfoBlock2(infoblock.surface, (x2, (y1+y2)/2), color, prio)
 			self.r_texts.add(InfoQueueEntry(ib2, y2))
 		else:
-			ib2 = InfoBlock2(infoblock.surface, (x1, (y1+y2)/2), RED)
+			ib2 = InfoBlock2(infoblock.surface, (x1, (y1+y2)/2), color, prio)
 			self.l_texts.add(InfoQueueEntry(ib2, y2))
 
 	def spectrum_update(self, msg):

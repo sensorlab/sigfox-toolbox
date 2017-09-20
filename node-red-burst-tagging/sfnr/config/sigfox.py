@@ -19,4 +19,4 @@ def bin_to_freq(n):
 	return _bin_to_freq[n]
 
 def freq_to_bin(f):
-	return int(np.round(np.interp(f, bin_to_freq, np.arange(len(bin_to_freq)))))
+	return int(np.round(np.interp(f, _bin_to_freq, np.arange(len(_bin_to_freq)))))
