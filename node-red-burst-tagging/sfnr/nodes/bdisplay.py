@@ -3,6 +3,100 @@ import numpy as np
 import pygame
 from matplotlib.cm import get_cmap
 
+class InfoQueueEntry(object):
+	def __init__(self, ib, y):
+		self.ib = ib
+		self.y = y
+		self.h = ib.surface.get_size()[1]
+
+class InfoQueue(object):
+	VMARGIN = 10
+	def __init__(self, back, x):
+		self.q = []
+		self.back = back
+		self.h = back.get_size()[1]
+		self.x = x
+		self.ceiling = 0
+
+	def add(self, ibe):
+		self.q.append(ibe)
+		self.q.sort(key=lambda ibe:ibe.y)
+
+	def scroll(self):
+		q2 = []
+		for ibe in self.q:
+			if self.ceiling + ibe.h < self.h:
+				if self.ceiling < ibe.y:
+					y = ibe.y
+				else:
+					y = self.ceiling
+
+				print("Drawing at %d" % (y,))
+				ibe.ib.blit(self.back, self.x, y)
+
+				self.ceiling = y + ibe.h + self.VMARGIN
+				print("Ceiling now %d" % (self.ceiling,))
+			else:
+				ibe.y -= 1
+				ibe.ib.anchor = (ibe.ib.anchor[0], ibe.ib.anchor[1] - 1)
+
+				if ibe.y > self.h*3/4:
+					q2.append(ibe)
+
+		self.ceiling -= 1
+		self.q = q2
+
+class InfoBlock2(object):
+	def __init__(self, surface, anchor, color):
+		self.surface = surface
+		self.anchor = anchor
+		self.color = color
+
+	def blit(self, back, x, y):
+		back.blit(self.surface, (x,y))
+
+		w, h = self.surface.get_size()
+
+		ax, ay = self.anchor
+
+		if x < ax:
+			x2 = x+w
+			x3 = x2 + 2
+		else:
+			x2 = x
+			x3 = x2 - 2
+
+		pygame.draw.line(back, self.color, (ax, ay), (x3, y+h//2))
+		pygame.draw.line(back, self.color, (x3, y), (x3, y+h))
+
+
+class InfoBlock(object):
+	LINE_HEIGHT = 10
+	def __init__(self, text, font, color):
+
+		lines = text.split('\n')
+
+		w = 0
+		h = 0
+
+		surfaces = []
+		for line in lines:
+			surface = font.render(line, True, color)
+
+			sw, sh = surface.get_size()
+			w = max(sw, w)
+			h += self.LINE_HEIGHT
+
+			surfaces.append(surface)
+
+
+		self.surface = pygame.Surface((w, h))
+
+		y = 0
+		for surface in surfaces:
+			self.surface.blit(surface, (0, y))
+			y += self.LINE_HEIGHT
+
 class SFNRNode(SFNRBaseNode):
 
 	PORT = 7215
@@ -61,13 +155,16 @@ sfnr fft
 		self.t = np.empty(self.size[1])
 		self.t[:] = 0
 
-		super().run(opts)
+		self.l_texts = InfoQueue(self.back, 20)
+		self.r_texts = InfoQueue(self.back, self.dsize[0] - self.margin + 20)
 
-		self.l_texts = []
-		self.r_texts = []
+		super().run(opts)
 
 	def work(self, msg):
 		if 'data' in msg:
+			self.r_texts.scroll()
+			self.l_texts.scroll()
+
 			self.spectrum_update(msg)
 
 			#if np.random.random() < .1:
@@ -82,7 +179,7 @@ sfnr fft
 				self.add_burst(burst)
 
 	def add_burst(self, burst):
-		print(burst)
+		#print(burst)
 		RED = (255, 0, 0)
 
 		def gety(t):
@@ -91,29 +188,20 @@ sfnr fft
 		y1 = gety(burst['tstart'])
 		y2 = gety(burst['tstop'])
 
-		x1 = int(burst['fc'] - burst['bw']/2)
-		x2 = int(burst['fc'] + burst['bw']/2)
+		x1 = int(burst['fc'] - burst['bw']/2) + self.margin
+		x2 = int(burst['fc'] + burst['bw']/2) + self.margin
 
-		r = pygame.Rect(self.margin+x1, y1, x2-x1, y2-y1)
+		r = pygame.Rect(x1, y1, x2-x1, y2-y1)
 		pygame.draw.rect(self.back, RED, r, 1)
 
-		mw = -1
-		texts = []
-		for t in burst['text'].split('\n'):
-			text = self.font.render(t, True, RED)
-			mw = max(text.get_size()[0], mw)
-			texts.append(text)
+		infoblock = InfoBlock(burst['text'], self.font, RED)
 
-		if (x1+x2)/2 > self.size[0]/2:
-			x = self.dsize[0] - self.margin + 20
+		if (x1+x2)/2 > self.margin + self.size[0]/2:
+			ib2 = InfoBlock2(infoblock.surface, (x2, (y1+y2)/2), RED)
+			self.r_texts.add(InfoQueueEntry(ib2, y2))
 		else:
-			x = 20
-
-		#x = min(x2, self.size[0]-mw)
-		y = y2
-		for text in texts:
-			self.back.blit(text, (x, y))
-			y += 10
+			ib2 = InfoBlock2(infoblock.surface, (x1, (y1+y2)/2), RED)
+			self.l_texts.add(InfoQueueEntry(ib2, y2))
 
 	def spectrum_update(self, msg):
 		x = np.array(msg['data'])
