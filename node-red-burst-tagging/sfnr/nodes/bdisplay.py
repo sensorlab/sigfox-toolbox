@@ -25,12 +25,12 @@ class InfoQueue(object):
 	def scroll(self):
 		q2 = []
 		for ibe in self.q:
-			if self.ceiling + ibe.h < self.h:
-				if self.ceiling < ibe.y:
-					y = ibe.y
-				else:
-					y = self.ceiling
+			if self.ceiling < ibe.y:
+				y = ibe.y
+			else:
+				y = self.ceiling
 
+			if y + ibe.h < self.h:
 				ibe.ib.blit(self.back, self.x, y)
 
 				self.ceiling = y + ibe.h + self.VMARGIN
