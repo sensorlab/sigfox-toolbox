@@ -1,4 +1,5 @@
 from sfnr.core import SFNRBaseNode
+import sfnr.config.sigfox as cfg
 import numpy as np
 import pygame
 from matplotlib.cm import get_cmap
@@ -131,6 +132,7 @@ sfnr fft
 </pre>"""
 
 	CATEGORY = "sigfox"
+	K = 2
 
 	def run(self, opts):
 		pygame.display.init()
@@ -140,7 +142,7 @@ sfnr fft
 
 		self.margin = 200
 
-		self.size = 512, 800
+		self.size = cfg.M//self.K, 800
 		self.dsize = (self.size[0]+self.margin*2, self.size[1])
 		self.screen = pygame.display.set_mode(self.dsize)
 		pygame.display.set_caption("Burst display")
@@ -192,8 +194,8 @@ sfnr fft
 		y1 = gety(burst['tstart'])
 		y2 = gety(burst['tstop'])
 
-		x1 = int(burst['fc'] - burst['bw']/2) + self.margin
-		x2 = int(burst['fc'] + burst['bw']/2) + self.margin
+		x1 = cfg.freq_to_bin(burst['fc'] - burst['bw']/2)//self.K + self.margin
+		x2 = cfg.freq_to_bin(burst['fc'] + burst['bw']/2)//self.K + self.margin
 
 		r = pygame.Rect(x1, y1, x2-x1, y2-y1)
 		pygame.draw.rect(self.info, RED, r, 1)

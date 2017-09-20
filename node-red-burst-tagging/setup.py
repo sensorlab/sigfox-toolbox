@@ -31,7 +31,7 @@ setup(
 
     packages=find_packages(),
 
-    namespace_packages=['sfnr', 'sfnr.nodes'],
+    namespace_packages=['sfnr', 'sfnr.nodes', 'sfnr.config'],
 
     install_requires=['sfnr', 'numpy', 'pygame', 'matplotlib', 'opencv-python' ],
 

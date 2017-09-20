@@ -1,4 +1,5 @@
 from sfnr.core import SFNRBaseNode
+import sfnr.config.sigfox as cfg
 import numpy as np
 import cv2
 
@@ -41,10 +42,9 @@ sfnr fft
 	CATEGORY = "sigfox"
 
 	def run(self, opts):
-		self.M = 1024
 		self.N = 150
 
-		self.x = np.empty((self.N, self.M))
+		self.x = np.empty((self.N, cfg.M))
 		self.t = np.empty(self.N)
 		self.i = 0
 
@@ -100,13 +100,17 @@ sfnr fft
 
 			tstart = self.t[y]
 			tstop = self.t[y+h-1]
-			fc = (x+w/2.)/2.
-			bw = w/2.
+
+			f1 = cfg.bin_to_freq(x)
+			f2 = cfg.bin_to_freq(x+w)
+
+			fc = (f1 + f2)/2
+			bw = (f2 - f1)
 
 			ppeak = np.max(self.x[y:y+h-1,x:x+w-1])
 
-			text = "fc=%.0f Hz BW=%.0f Hz\nt=%.1f s Ppeak=%.0f dBm" % (
-					fc, bw, tstop-tstart, ppeak)
+			text = "%.6f MHz %.1f s\n%.0f dBm %.3f kHz" % (
+					fc/1e6, tstop-tstart, ppeak, bw/1e3)
 
 			bursts.append({
 				'tstart': tstart,
