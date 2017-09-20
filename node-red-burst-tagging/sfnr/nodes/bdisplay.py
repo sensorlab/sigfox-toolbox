@@ -31,11 +31,9 @@ class InfoQueue(object):
 				else:
 					y = self.ceiling
 
-				print("Drawing at %d" % (y,))
 				ibe.ib.blit(self.back, self.x, y)
 
 				self.ceiling = y + ibe.h + self.VMARGIN
-				print("Ceiling now %d" % (self.ceiling,))
 			else:
 				ibe.y -= 1
 				ibe.ib.anchor = (ibe.ib.anchor[0], ibe.ib.anchor[1] - 1)
@@ -148,6 +146,9 @@ sfnr fft
 		pygame.display.set_caption("Burst display")
 
 		self.back = pygame.Surface(self.dsize)
+		self.info = pygame.Surface(self.dsize, pygame.SRCALPHA)
+		self.info.fill((0, 0, 0, 0))
+		self.info.set_alpha(128)
 		self.line = pygame.Surface((self.dsize[0], 1))
 
 		self.cmap = get_cmap('magma')
@@ -155,8 +156,8 @@ sfnr fft
 		self.t = np.empty(self.size[1])
 		self.t[:] = 0
 
-		self.l_texts = InfoQueue(self.back, 20)
-		self.r_texts = InfoQueue(self.back, self.dsize[0] - self.margin + 20)
+		self.l_texts = InfoQueue(self.info, 20)
+		self.r_texts = InfoQueue(self.info, self.dsize[0] - self.margin + 20)
 
 		super().run(opts)
 
@@ -180,7 +181,7 @@ sfnr fft
 
 	def add_burst(self, burst):
 		#print(burst)
-		RED = (255, 0, 0)
+		RED = (255, 0, 0, 128)
 
 		def gety(t):
 			return int(np.round(np.interp(t, self.t, np.arange(len(self.t)))))
@@ -192,7 +193,7 @@ sfnr fft
 		x2 = int(burst['fc'] + burst['bw']/2) + self.margin
 
 		r = pygame.Rect(x1, y1, x2-x1, y2-y1)
-		pygame.draw.rect(self.back, RED, r, 1)
+		pygame.draw.rect(self.info, RED, r, 1)
 
 		infoblock = InfoBlock(burst['text'], self.font, RED)
 
@@ -230,7 +231,10 @@ sfnr fft
 		#print(s.get_size())
 
 		self.back.scroll(dy=-1)
+		self.info.scroll(dy=-1)
+		pygame.draw.line(self.info, (0, 0, 0, 0), (0, self.dsize[1]-1), (self.dsize[0]-1, self.dsize[1]-1))
 		#self.back.blit(s, dest=(0,self.size[1]-1))
 		self.back.blit(self.line, dest=(0,self.size[1]-1))
 		self.screen.blit(self.back, dest=(0,0))
+		self.screen.blit(self.info, dest=(0,0))
 		pygame.display.flip()
