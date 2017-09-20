@@ -51,6 +51,7 @@ sfnr fft
 		self.size = 512, 800
 		self.dsize = (self.size[0]+self.margin*2, self.size[1])
 		self.screen = pygame.display.set_mode(self.dsize)
+		pygame.display.set_caption("Burst display")
 
 		self.back = pygame.Surface(self.dsize)
 		self.line = pygame.Surface((self.dsize[0], 1))
