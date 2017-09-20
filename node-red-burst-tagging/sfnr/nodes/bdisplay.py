@@ -3,7 +3,6 @@ import numpy as np
 import pygame
 from matplotlib.cm import get_cmap
 
-
 class SFNRNode(SFNRBaseNode):
 
 	PORT = 7215
@@ -47,11 +46,14 @@ sfnr fft
 
 		self.font = pygame.font.SysFont("sans", 10)
 
-		self.size = 512, 800
-		self.screen = pygame.display.set_mode(self.size)
+		self.margin = 200
 
-		self.back = pygame.Surface(self.size)
-		self.line = pygame.Surface((self.size[0], 1))
+		self.size = 512, 800
+		self.dsize = (self.size[0]+self.margin*2, self.size[1])
+		self.screen = pygame.display.set_mode(self.dsize)
+
+		self.back = pygame.Surface(self.dsize)
+		self.line = pygame.Surface((self.dsize[0], 1))
 
 		self.cmap = get_cmap('magma')
 
@@ -59,6 +61,9 @@ sfnr fft
 		self.t[:] = 0
 
 		super().run(opts)
+
+		self.l_texts = []
+		self.r_texts = []
 
 	def work(self, msg):
 		if 'data' in msg:
@@ -88,7 +93,7 @@ sfnr fft
 		x1 = int(burst['fc'] - burst['bw']/2)
 		x2 = int(burst['fc'] + burst['bw']/2)
 
-		r = pygame.Rect(x1, y1, x2-x1, y2-y1)
+		r = pygame.Rect(self.margin+x1, y1, x2-x1, y2-y1)
 		pygame.draw.rect(self.back, RED, r, 1)
 
 		mw = -1
@@ -98,7 +103,12 @@ sfnr fft
 			mw = max(text.get_size()[0], mw)
 			texts.append(text)
 
-		x = min(x2, self.size[0]-mw)
+		if (x1+x2)/2 > self.size[0]/2:
+			x = self.dsize[0] - self.margin + 20
+		else:
+			x = 20
+
+		#x = min(x2, self.size[0]-mw)
 		y = y2
 		for text in texts:
 			self.back.blit(text, (x, y))
@@ -124,7 +134,7 @@ sfnr fft
 			b[i,:] = self.cmap(v[i])[:3]
 
 		b *= 255
-		a[:,0,:] = b
+		a[self.margin:-self.margin,0,:] = b
 
 		del a
 
