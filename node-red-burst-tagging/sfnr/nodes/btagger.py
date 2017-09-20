@@ -64,34 +64,39 @@ sfnr fft
 
 	def detect_bursts(self):
 
-		thresh = cv2.threshold(self.x, -121, 255, cv2.THRESH_BINARY)[1]
+		xc = cv2.GaussianBlur(self.x, (5,5), 0)
+		xc = np.array(xc, dtype=np.uint8)
+
+		thresh = cv2.adaptiveThreshold(xc, 1,
+				cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+				cv2.THRESH_BINARY, 101, -1)
 
 		def dilate(x):
 			n = 100
 
-			x0 = np.zeros((x.shape[0]+n*2, x.shape[1]+n*2))
+			x0 = np.zeros((x.shape[0]+n*2, x.shape[1]+n*2), dtype=np.uint8)
 			x0[n:-n,n:-n] = x
 
 			kernel = np.array([[1, 1, 1]])
 
-			x0 = cv2.dilate(x0, None, iterations=1)
+			x0 = cv2.erode(x0, None, iterations=1)
+			x0 = cv2.dilate(x0, None, iterations=2)
 			x0 = cv2.dilate(x0, kernel, iterations=n)
 			x0 = cv2.erode(x0, kernel, iterations=n)
 
 			return x0[n:-n,n:-n]
 
 		thresh = dilate(thresh)
-		thresh = np.array(thresh, dtype=np.uint8)
 
 		cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[1]
 
 		bursts = []
 
 		for c in cnts:
-			if cv2.contourArea(c) < 10:
-				continue
-
 			(x, y, w, h) = cv2.boundingRect(c)
+
+			if h*w < 30:
+			        continue
 
 			tstart = self.t[y]
 			tstop = self.t[y+h-1]
