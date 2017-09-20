@@ -154,12 +154,15 @@ sfnr fft
 		self.cmap = get_cmap('magma')
 
 		self.t = np.empty(self.size[1])
+		self.reset_timeline()
+
+		super().run(opts)
+
+	def reset_timeline(self):
 		self.t[:] = 0
 
 		self.l_texts = InfoQueue(self.info, 20)
 		self.r_texts = InfoQueue(self.info, self.dsize[0] - self.margin + 20)
-
-		super().run(opts)
 
 	def work(self, msg):
 		if 'data' in msg:
@@ -205,6 +208,12 @@ sfnr fft
 			self.l_texts.add(InfoQueueEntry(ib2, y2))
 
 	def spectrum_update(self, msg):
+		# Reset timeline if timestamps changed significantly. Prevents
+		# garbled display when e. g. source of spectrum data was
+		# restarted
+		if abs(self.t[-1] - msg['timestamp']) > 100:
+			self.reset_timeline()
+
 		x = np.array(msg['data'])
 
 		self.t[:-1] = self.t[1:]
