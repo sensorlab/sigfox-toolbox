@@ -13,14 +13,16 @@ class SFNRNode(SFNRBaseNode):
 	SLUG = 'btagger'
 
 	DESC = """
-<p>Perform a discrete Fourier transform on signal samples and return the power spectrum.</p>
+<p>Detect transmission bursts on a waterfall diagram. The algorithm works using
+a moving window, hence it will take some time before the first bursts are
+reported on the output.</p>
 
-<p>Input:</p>
+<p>Waterfall diagram input:</p>
 
 <pre>
 {
-    ...
-    'data': [ <i>samples</i> ]
+    'data': [ <i>RSSI in dBm</i>, ... ]
+    'timestamp': <i>timestamp</i>
 }
 </pre>
 
@@ -28,15 +30,24 @@ class SFNRNode(SFNRBaseNode):
 
 <pre>
 {
-    ...
-    'fft': [ <i>fft bins</i> ]
+    'bursts': [
+        {
+	    'tstart': <i>burst start time</i>,
+	    'tstop': <i>burst stop time</i>,
+	    'fc': <i>burst central frequency</i>,
+	    'bw': <i>burst bandwidth</i>,
+	    'bold': <i>whether the burst should be emphasized on display</i>,
+	    'text': <i>text to show with the burst</i>
+	},
+	...
+    ]
 }
 </pre>
 
 <p>To run back-end for this node, run the following:</p>
 
 <pre>
-sfnr fft
+sfnr btagger
 </pre>"""
 
 	CATEGORY = "sigfox"

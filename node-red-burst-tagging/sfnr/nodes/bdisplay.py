@@ -107,30 +107,39 @@ class SFNRNode(SFNRBaseNode):
 	SLUG = 'bdisplay'
 
 	DESC = """
-<p>Perform a discrete Fourier transform on signal samples and return the power spectrum.</p>
+<p>Show a real-time waterfall diagram, with an overlay of recognized burst and associated meta-data. The visualization is displayed in a separate window (shown when you run the back-end). This node serves as an input port for the data to be visualized.</p>
 
-<p>Input:</p>
+<p>Input for spectrum data to be displayed on the waterfall diagram in the background:</p>
 
 <pre>
 {
-    ...
-    'data': [ <i>samples</i> ]
+    'data': [ <i>RSSI in dBm</i>, ... ]
+    'timestamp': <i>timestamp</i>
 }
 </pre>
 
-<p>Output:</p>
+<p>Input for burst overlay:</p>
 
 <pre>
 {
-    ...
-    'fft': [ <i>fft bins</i> ]
+    'bursts': [
+        {
+	    'tstart': <i>burst start time</i>,
+	    'tstop': <i>burst stop time</i>,
+	    'fc': <i>burst central frequency</i>,
+	    'bw': <i>burst bandwidth</i>,
+	    'bold': <i>whether the burst should be emphasized on display</i>,
+	    'text': <i>text to show with the burst</i>
+	},
+	...
+    ]
 }
 </pre>
 
 <p>To run back-end for this node, run the following:</p>
 
 <pre>
-sfnr fft
+sfnr bdisplay
 </pre>"""
 
 	CATEGORY = "sigfox"

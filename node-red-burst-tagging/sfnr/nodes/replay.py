@@ -25,14 +25,14 @@ class SFNRNode(SFNRBaseNode):
 	TEMPLATE = 'tcpin'
 
 	DESC = """
-<p>This node replays old spectrum data obtained from the Sigfox base station from a file. Note: this node returns a JSON string, not an object, so you need to pass its output through a <i>json</i> node first!</p>
+<p>This node replays old spectrum data obtained from the Sigfox base station from a file.</p>
 
 <p>Output:</p>
 
 <pre>
 {
+    'data': [ <i>RSSI in dBm</i>, ... ]
     'timestamp': <i>timestamp</i>
-    'data': [ <i>samples</i> ]
 }
 </pre>
 
@@ -40,7 +40,11 @@ class SFNRNode(SFNRBaseNode):
 
 <pre>
 sfnr -opath=ws_traffic_20170724 replay
-</pre>"""
+</pre>
+
+<p>Where <i>ws_traffic_20170724</i> is the prefix of binary files produced by
+the <i>logserver.py</i> script (e.g. <i>ws_traffic_20170724.data.bin</i> and
+<i>ws_traffic_20170724.timestamps.bin</i>)"""
 
 	CATEGORY = "sigfox"
 
