@@ -37,7 +37,8 @@ reported on the output.</p>
 	    'fc': <i>burst central frequency</i>,
 	    'bw': <i>burst bandwidth</i>,
 	    'bold': <i>whether the burst should be emphasized on display</i>,
-	    'text': <i>text to show with the burst</i>
+	    'text': <i>text to show with the burst</i>,
+	    'data': [ <i>RSSI in dBm</i>, ... ]
 	},
 	...
     ]
@@ -115,6 +116,8 @@ sfnr btagger
 			f1 = cfg.bin_to_freq(x)
 			f2 = cfg.bin_to_freq(x+w)
 
+			data = self.x[y:y+h,x:x+w]
+
 			fc = (f1 + f2)/2
 			bw = (f2 - f1)
 
@@ -130,6 +133,7 @@ sfnr btagger
 				'bw': bw,
 				'text': text,
 				'bold': int(ppeak > -100),
+				'data': data.tolist(),
 				})
 
 		print("detected %d bursts" % (len(bursts),))
