@@ -60,7 +60,7 @@ Node-RED. See `btagger_run --help` for details.
 Burst tagging block for Node-RED flows was written by Tomaž Šolc,
 **tomaz.solc@ijs.si**.
 
-Copyright (C) 2017 SensorLab, Jožef Stefan Institute http://sensorlab.ijs.si
+Copyright (C) 2018 SensorLab, Jožef Stefan Institute http://sensorlab.ijs.si
 
 Javascript code was adopted from the Node-RED distribution, which is Copyright
 2013, 2016 IBM Corp.
