@@ -50,9 +50,14 @@ window. The command line for starting the back-end processes is shown in the
 Note that `sfnr bdisplay` opens a separate window on the desktop. Visualization
 cannot be shown with-in the browser.
 
+It is also possible to run the burst tagger in a stand-alone mode, to batch
+process files with spectrum sensing data. While Node-RED is useful for
+real-time processing, batch processing is much faster without the overhead of
+Node-RED. See `btagger_run --help` for details.
+
 ## Author and license
 
-Real-time visualization block for Node-RED flows was written by Tomaž Šolc,
+Burst tagging block for Node-RED flows was written by Tomaž Šolc,
 **tomaz.solc@ijs.si**.
 
 Copyright (C) 2017 SensorLab, Jožef Stefan Institute http://sensorlab.ijs.si

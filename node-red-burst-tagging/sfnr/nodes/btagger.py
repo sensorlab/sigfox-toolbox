@@ -1,3 +1,9 @@
+import argparse
+import sys
+from sfnr.nodes.replay import WSTrafficDump
+import progressbar
+import json
+
 from sfnr.core import SFNRBaseNode
 import sfnr.config.sigfox as cfg
 import numpy as np
@@ -53,14 +59,12 @@ sfnr btagger
 
 	CATEGORY = "sigfox"
 
-	def run(self, opts):
+	def __init__(self):
 		self.N = 150
 
 		self.x = np.empty((self.N, cfg.M))
 		self.t = np.empty(self.N)
 		self.i = 0
-
-		super().run(opts)
 
 	def work(self, msg):
 		if self.i < self.N:
@@ -129,6 +133,8 @@ sfnr btagger
 			bursts.append({
 				'tstart': tstart,
 				'tstop': tstop,
+				'binfirst': x,
+				'binlast': x+w,
 				'fc': fc,
 				'bw': bw,
 				'text': text,
@@ -136,7 +142,7 @@ sfnr btagger
 				'data': data.tolist(),
 				})
 
-		print("detected %d bursts" % (len(bursts),))
+		#print("detected %d bursts" % (len(bursts),))
 
 		return bursts
 
@@ -145,3 +151,50 @@ sfnr btagger
 		self.t[self.i] = msg['timestamp']
 
 		self.i += 1
+
+
+def main():
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-i', '--input', required=True,
+			help="Path to the wstraffic file to process (without .data.bin suffix)")
+	parser.add_argument('-o', '--output', required=True,
+			help="Path to write the output JSON file to")
+
+	args = parser.parse_args()
+
+	wstraffic = WSTrafficDump(args.input)
+
+	node = SFNRNode()
+
+	widgets = [ progressbar.Percentage(), ' ', progressbar.Bar(), ' ', progressbar.ETA() ]
+	maxval = wstraffic.get_timestamps().shape[0]
+	pbar = progressbar.ProgressBar(widgets=widgets, maxval=maxval)
+
+	print("N =", maxval)
+
+	i = 0
+	pbar.start()
+
+	bursts = []
+	for t, x0 in wstraffic.iter_by_timestamps():
+
+		msg = {
+			'timestamp': t,
+			'data': x0
+		}
+
+		rv = node.work(msg)
+
+		for burst in rv['bursts']:
+			del burst['data']
+			del burst['text']
+			del burst['bold']
+			bursts.append(burst)
+
+		pbar.update(i)
+		i += 1
+
+	pbar.finish()
+
+	with open(args.output, "w") as f:
+		json.dump(bursts, f, indent=4)

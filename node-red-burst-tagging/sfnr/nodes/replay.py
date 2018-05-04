@@ -21,6 +21,10 @@ class WSTrafficDump:
 		self.data_path = path + ".data.bin"
 		self.time_path = path + ".timestamps.bin"
 
+	def get_timestamps(self):
+		t = np.memmap(self.time_path, dtype=np.float64, mode='r')
+		return t
+
 	def iter_by_timestamps(self):
 		x = np.memmap(self.data_path, dtype=np.uint8, mode='r')
 		assert x.shape[0] % self.M == 0
@@ -29,7 +33,7 @@ class WSTrafficDump:
 
 		x = x.reshape((N, self.M))
 
-		t = np.memmap(self.time_path, dtype=np.float64, mode='r')
+		t = self.get_timestamps()
 		assert t.shape[0] == N
 
 		#print("N = %d" % (N,))

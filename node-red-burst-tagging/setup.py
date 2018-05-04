@@ -33,7 +33,13 @@ setup(
 
     namespace_packages=['sfnr', 'sfnr.nodes', 'sfnr.config'],
 
-    install_requires=['sfnr', 'numpy', 'pygame', 'matplotlib', 'opencv-python' ],
+    install_requires=['sfnr', 'numpy', 'pygame', 'matplotlib', 'opencv-python', 'progressbar33' ],
 
-    cmdclass={'install': install}
+    cmdclass={'install': install},
+
+    entry_points={
+        'console_scripts': [
+            'btagger_run = sfnr.nodes.btagger:main',
+        ]
+    },
 )
