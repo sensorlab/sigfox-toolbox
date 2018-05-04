@@ -11,8 +11,34 @@ want_stop = False
 
 def handler(signum, frame):
 	global want_stop
-	print("Stopping sensor. Please wait.")
+	print("Stopping replay. Please wait.")
 	want_stop = True
+
+class WSTrafficDump:
+	M = 1024
+
+	def __init__(self, path):
+		self.data_path = path + ".data.bin"
+		self.time_path = path + ".timestamps.bin"
+
+	def iter_by_timestamps(self):
+		x = np.memmap(self.data_path, dtype=np.uint8, mode='r')
+		assert x.shape[0] % self.M == 0
+
+		N = x.shape[0] // self.M
+
+		x = x.reshape((N, self.M))
+
+		t = np.memmap(self.time_path, dtype=np.float64, mode='r')
+		assert t.shape[0] == N
+
+		#print("N = %d" % (N,))
+
+		for i in range(N):
+			x0 = np.array(x[i,:], dtype=np.float64)
+			x0 = x0 * -1
+
+			yield t[i], x0
 
 class SFNRNode(SFNRBaseNode):
 
@@ -56,22 +82,7 @@ the <i>logserver.py</i> script (e.g. <i>ws_traffic_20170724.data.bin</i> and
 		self.run_client(path)
 
 	def run_client(self, path):
-		M = 1024
-
-		data_path = path + ".data.bin"
-		time_path = path + ".timestamps.bin"
-
-		x = np.memmap(data_path, dtype=np.uint8, mode='r')
-		assert x.shape[0]%M == 0
-
-		n = x.shape[0]//M
-
-		x = x.reshape((n, M))
-
-		t = np.memmap(time_path, dtype=np.float64, mode='r')
-		assert t.shape[0] == n
-
-		print("N = %d" % (n,))
+		wstraffic = WSTrafficDump(path)
 
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect(("localhost", self.PORT))
@@ -81,20 +92,17 @@ the <i>logserver.py</i> script (e.g. <i>ws_traffic_20170724.data.bin</i> and
 
 		global want_stop
 
-		i = 0
-		while not want_stop:
-
-			x0 = np.array(x[i,:], dtype=np.float64)
-			x0 = x0 * -1
+		for t, x0 in wstraffic.iter_by_timestamps():
 
 			j = json.dumps({
-				'timestamp': t[i],
+				'timestamp': t,
 				'data': list(x0)
 			})
 
 			j += '\n'
 			s.sendall(j.encode('ascii'))
 
-			i = (i + 1) % n
-
 			time.sleep(.1)
+
+			if want_stop:
+				break
