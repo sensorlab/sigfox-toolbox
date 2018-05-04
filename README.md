@@ -111,6 +111,9 @@ installation instructions.
  *  `node-red-visualization` - Real-time visualization block for Node-RED
     flows.
 
+ *  `node-red-burst-tagging` - Real-time burst tagging block for Node-Red and a
+    stand-alone tool for batch processing spectrum sensing data.
+
  *  `vesna-sfxlib-rpc-firmware` - Firmware for running the proprietary SIGFOX
     MAC protocol library on a VESNA sensor node over a remote-procedure call
     interface.
