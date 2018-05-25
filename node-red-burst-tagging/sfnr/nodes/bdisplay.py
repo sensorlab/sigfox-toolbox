@@ -71,7 +71,7 @@ class InfoBlock2(object):
 
 
 class InfoBlock(object):
-	LINE_HEIGHT = 10
+	LINE_HEIGHT = 16
 	def __init__(self, text, font, color):
 
 		lines = text.split('\n')
@@ -149,7 +149,7 @@ sfnr bdisplay
 		pygame.display.init()
 		pygame.font.init()
 
-		self.font = pygame.font.SysFont("sans", 10)
+		self.font = pygame.font.SysFont("sans", 16)
 
 		self.margin = 200
 
@@ -197,10 +197,10 @@ sfnr bdisplay
 
 	def add_burst(self, burst):
 		if burst['bold']:
-			color = (255, 0, 0, 200)
+			color = (255, 255, 255, 255)
 			prio = 0
 		else:
-			color = (255, 0, 0, 120)
+			color = (255, 255, 255, 200)
 			prio = 1
 
 		def gety(t):
