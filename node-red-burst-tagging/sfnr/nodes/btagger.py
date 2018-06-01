@@ -60,19 +60,23 @@ sfnr btagger
 	CATEGORY = "sigfox"
 
 	def __init__(self):
-		self.N = 150
+		# detection window size
+		self.N = 300
+
+		# perform detection every Nstep
+		self.Nstep = self.N // 10
 
 		self.x = np.empty((self.N, cfg.M))
 		self.t = np.empty(self.N)
 		self.i = 0
 
-	def work(self, msg):
-		if self.i < self.N:
-			self.spectrum_update(msg)
+		self.burst_dedup = dict()
 
-		if self.i >= self.N:
-			bursts = self.detect_bursts()
-			self.i = 0
+	def work(self, msg):
+		self.spectrum_update(msg)
+
+		if (self.i >= self.N) and (self.i % self.Nstep == 0):
+			bursts = self.detect_bursts_dedup()
 		else:
 			bursts = []
 
@@ -146,9 +150,46 @@ sfnr btagger
 
 		return bursts
 
+	def detect_bursts_dedup(self):
+
+		# Find all bursts in the current window
+		bursts = self.detect_bursts()
+
+		def get_key(burst):
+			return (burst['tstart'], burst['tstop'], burst['binfirst'], burst['binlast'])
+
+		ret_bursts = []
+
+		for burst in bursts:
+			key = get_key(burst)
+
+			# If we have already sent out this burst, ignore.
+			if key not in self.burst_dedup:
+
+				# Only sent out bursts that are inside the Nstep margin
+				# at the start and stop of the window.
+				if burst['tstop'] < self.t[-self.Nstep] \
+						and burst['tstart'] > self.t[self.Nstep]:
+
+					ret_bursts.append(burst)
+					self.burst_dedup[key] = burst
+
+		# Clean up the deduplication buffer
+		for key in list(self.burst_dedup.keys()):
+
+			burst = self.burst_dedup[key]
+			if burst['tstop'] < self.t[0]:
+				del self.burst_dedup[key]
+
+		return ret_bursts
+
 	def spectrum_update(self, msg):
-		self.x[self.i,:] = msg['data']
-		self.t[self.i] = msg['timestamp']
+
+		self.x[:-1,:] = self.x[1:,:]
+		self.x[-1,:] = msg['data']
+
+		self.t[:-1] = self.t[1:]
+		self.t[-1] = msg['timestamp']
 
 		self.i += 1
 
