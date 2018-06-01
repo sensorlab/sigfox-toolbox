@@ -118,6 +118,9 @@ sfnr btagger
 			if h*w < 30:
 			        continue
 
+			if h > self.Nstep:
+				print("Saw burst with length %d (> Nstep = %d)" % (h, self.Nstep))
+
 			tstart = self.t[y]
 			tstop = self.t[y+h-1]
 
