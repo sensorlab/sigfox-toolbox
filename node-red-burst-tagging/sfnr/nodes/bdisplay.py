@@ -200,7 +200,7 @@ sfnr bdisplay
 			color = (255, 255, 255, 255)
 			prio = 0
 		else:
-			color = (255, 255, 255, 200)
+			color = (255, 255, 255, 160)
 			prio = 1
 
 		def gety(t):
