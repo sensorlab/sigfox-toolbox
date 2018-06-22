@@ -60,7 +60,11 @@ class DemoClassifier(SFNRBaseNode):
 
 			if cls != 'unknown':
 				burst['text'] = cls
-				bursts2.append(burst)
+				burst['bold'] = 1
+			else:
+				burst['bold'] = 0
+
+			bursts2.append(burst)
 
 		msg['bursts'] = bursts2
 		return msg
@@ -72,9 +76,9 @@ class DemoClassifier(SFNRBaseNode):
 		if bw > 190e3:
 			cls = "IEEE 802.15.4";
 		elif (bw > 10e3) and (bw < 13e3) and (tlen < 2):
-			cls = "LoRA"
-		elif (bw > 18e3) and (bw < 22e3) and (tlen < 1):
 			cls = "proprietary"
+		elif (bw > 15e3) and (bw < 22e3) and (tlen < 1):
+			cls = "LoRa"
 		elif (bw < 2e3) and (tlen > 1):
 			cls = "SIGFOX"
 		else:
